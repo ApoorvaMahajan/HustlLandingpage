@@ -24,7 +24,7 @@ const PoweredByBolt: React.FC<PoweredByBoltProps> = ({
       className={`inline-block transition-all duration-300 hover:opacity-90 ${positionClasses[position]} ${className}`}
     >
       <img 
-        src="/image.png" 
+        src="/black_circle_360x360.png" 
         alt="Powered by Bolt" 
         className="w-12 h-12 rounded-full shadow-md hover:shadow-lg transition-shadow"
       />
