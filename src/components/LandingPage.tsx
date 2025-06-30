@@ -1,350 +1,284 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { ArrowRight, Coffee, Book, MapPin, Clock, DollarSign, Star, Shield, Users, Zap, MessageSquare, Award, ChevronRight, ChevronLeft, Briefcase, Mail, Building } from "lucide-react";
-import { StarBorder } from "./ui/star-border";
+import { useNavigate } from "react-router-dom";
+import { 
+  Zap, 
+  ArrowRight, 
+  Users, 
+  Shield, 
+  DollarSign, 
+  Star, 
+  MessageSquare, 
+  Award, 
+  ChevronRight, 
+  ChevronLeft,
+  ExternalLink,
+  Mail,
+  Send
+} from "lucide-react";
+import { auth } from "../lib/firebase";
 import LearnMoreModal from "./LearnMoreModal";
 
 const LandingPage = () => {
-  const [currentSlide, setCurrentSlide] = useState(0);
+  const navigate = useNavigate();
   const [showLearnMore, setShowLearnMore] = useState(false);
-  const [isVisible, setIsVisible] = useState<{ [key: string]: boolean }>({
-    hero: false,
-    features: false,
-    howItWorks: false,
-    testimonials: false,
-    mission: false,
-    techStack: false,
-    partners: false,
-    business: false,
-  });
+  const [currentTestimonial, setCurrentTestimonial] = useState(0);
+  const [isVisible, setIsVisible] = useState(false);
+  const [email, setEmail] = useState("");
 
-  const slides = [
-    {
-      title: "Connect with fellow students",
-      description: "Get help with quick tasks or earn money helping others",
-      image: "https://images.pexels.com/photos/1438072/pexels-photo-1438072.jpeg?auto=format&fit=crop&w=1470&q=80",
-      color: "from-blue-600 to-indigo-700"
-    },
-    {
-      title: "Coffee runs made easy",
-      description: "Need coffee during a study session? Get it delivered!",
-      image: "https://images.pexels.com/photos/302899/pexels-photo-302899.jpeg?auto=format&fit=crop&w=1470&q=80",
-      color: "from-orange-500 to-red-600"
-    },
-    {
-      title: "Study materials on demand",
-      description: "Get notes, textbooks, or printing delivered to you",
-      image: "https://images.pexels.com/photos/5428003/pexels-photo-5428003.jpeg?auto=format&fit=crop&w=1470&q=80",
-      color: "from-green-500 to-emerald-600"
-    }
-  ];
+  useEffect(() => {
+    // Animate in elements
+    setIsVisible(true);
+
+    // Auto-rotate testimonials
+    const interval = setInterval(() => {
+      setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleGoToApp = () => {
+    navigate("/app");
+  };
+
+  const handleSubmitInquiry = (e: React.FormEvent) => {
+    e.preventDefault();
+    window.location.href = `mailto:hustlapp@outlook.com?subject=Business Inquiry&body=Hello Hustl team, I'm interested in learning more about partnering with you. My email is ${email}.`;
+    setEmail("");
+  };
 
   const testimonials = [
     {
+      quote: "Hustl has completely changed how I manage my time on campus. I can focus on studying while getting help with small tasks.",
       name: "Sarah M.",
-      major: "Biology",
-      quote: "Hustl saved me during finals week! I needed coffee but couldn't leave the library, and someone delivered it in 15 minutes.",
-      image: "https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg?auto=format&fit=crop&w=800&q=80"
+      role: "Biology Major",
+      image: "https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
     },
     {
-      name: "James K.",
-      major: "Computer Science",
-      quote: "I make around $100 a week just doing coffee runs and food deliveries between classes. Perfect for a busy student schedule!",
-      image: "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=format&fit=crop&w=800&q=80"
+      quote: "I've been able to earn money between classes by helping other students. It's flexible and fits perfectly with my schedule.",
+      name: "Michael T.",
+      role: "Computer Science Major",
+      image: "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
     },
     {
-      name: "Aisha T.",
-      major: "Psychology",
-      quote: "The safety features make me feel comfortable using the app. I've met some great people while completing tasks!",
-      image: "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=format&fit=crop&w=800&q=80"
+      quote: "The coffee delivery feature saved me during finals week! I could stay focused in the library while someone brought me coffee.",
+      name: "Jessica L.",
+      role: "Psychology Major",
+      image: "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
     }
   ];
 
-  const [currentTestimonial, setCurrentTestimonial] = useState(0);
-
-  useEffect(() => {
-    // Auto-advance slides
-    const slideInterval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % slides.length);
-    }, 5000);
-
-    // Auto-advance testimonials
-    const testimonialInterval = setInterval(() => {
-      setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
-    }, 7000);
-
-    // Set up intersection observers for animations
-    const observerOptions = {
-      threshold: 0.2,
-      rootMargin: "0px 0px -100px 0px"
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          setIsVisible(prev => ({ ...prev, [entry.target.id]: true }));
-        }
-      });
-    }, observerOptions);
-
-    const sections = document.querySelectorAll('section[id]');
-    sections.forEach(section => {
-      observer.observe(section);
-    });
-
-    // Set hero to visible immediately
-    setIsVisible(prev => ({ ...prev, hero: true }));
-
-    return () => {
-      clearInterval(slideInterval);
-      clearInterval(testimonialInterval);
-      observer.disconnect();
-    };
-  }, []);
-
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white overflow-hidden">
-      {/* Hero Section */}
-      <section id="hero" className={`relative min-h-screen flex items-center transition-opacity duration-1000 ${isVisible.hero ? 'opacity-100' : 'opacity-0'}`}>
-        {/* Background Slider */}
-        <div className="absolute inset-0 overflow-hidden">
-          {slides.map((slide, index) => (
-            <div
-              key={index}
-              className={`absolute inset-0 transition-opacity duration-1000 ${
-                currentSlide === index ? "opacity-100" : "opacity-0"
-              }`}
-            >
-              <div className="absolute inset-0 bg-black opacity-60 z-10"></div>
-              <img
-                src={slide.image}
-                alt={slide.title}
-                className="w-full h-full object-cover scale-105 transition-transform duration-10000 transform"
-                style={{ 
-                  transformOrigin: 'center',
-                  transform: currentSlide === index ? 'scale(1.05)' : 'scale(1)'
+    <div className="min-h-screen bg-gradient-to-b from-white to-blue-50">
+      {/* Animated Background */}
+      <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute w-full h-full">
+            {Array.from({ length: 20 }).map((_, i) => (
+              <div
+                key={i}
+                className="absolute rounded-full bg-gradient-to-r from-blue-400 to-blue-600 animate-pulse"
+                style={{
+                  width: `${Math.random() * 300 + 50}px`,
+                  height: `${Math.random() * 300 + 50}px`,
+                  left: `${Math.random() * 100}%`,
+                  top: `${Math.random() * 100}%`,
+                  opacity: Math.random() * 0.1,
+                  animationDuration: `${Math.random() * 8 + 4}s`,
+                  animationDelay: `${Math.random() * 5}s`,
+                  transform: `scale(${Math.random() * 0.8 + 0.2})`,
                 }}
               />
-              <div className={`absolute inset-0 bg-gradient-to-r ${slide.color} opacity-60 z-20`}></div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
+      </div>
 
-        {/* Animated particles */}
-        <div className="absolute inset-0 z-20 pointer-events-none overflow-hidden">
-          {[...Array(20)].map((_, i) => (
-            <div 
-              key={i}
-              className="absolute rounded-full bg-white/20 animate-pulse-custom"
-              style={{
-                width: `${Math.random() * 10 + 5}px`,
-                height: `${Math.random() * 10 + 5}px`,
-                top: `${Math.random() * 100}%`,
-                left: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 5}s`,
-                animationDuration: `${Math.random() * 3 + 2}s`
-              }}
-            ></div>
-          ))}
-        </div>
-
-        {/* Content */}
-        <div className="container mx-auto px-6 relative z-30">
-          <div className="max-w-4xl mx-auto text-center">
-            <div className="mb-8 flex justify-center">
-              <div className="relative">
-                <img 
-                  src="/files_5770123-1751251303321-image.png" 
-                  alt="Hustl Logo" 
-                  className="h-24 sm:h-32 w-auto animate-fade-in-down"
-                />
-                <div className="absolute -inset-1 bg-white/20 rounded-full blur-xl -z-10 animate-pulse-custom"></div>
-              </div>
+      {/* Header */}
+      <header className="relative z-10 bg-white shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-4">
+            <div className="flex items-center">
+              <img 
+                src="/files_5770123-1751251303321-image.png" 
+                alt="Hustl Logo" 
+                className="h-10 w-auto mr-2" 
+              />
+              <span className="text-2xl font-bold text-[#0F2557]">Hustl</span>
             </div>
-            
-            {/* Animated Tagline */}
-            <div className="overflow-hidden mb-8">
-              <div className="flex justify-center">
-                <div className="text-xl sm:text-2xl md:text-3xl font-bold text-white bg-black/30 px-8 py-4 rounded-full backdrop-blur-sm border border-white/20 shadow-xl">
-                  <span className="animate-fade-in-up inline-block">Connect.</span>
-                  <span className="animate-fade-in-up animation-delay-200 inline-block ml-2">Help.</span>
-                  <span className="animate-fade-in-up animation-delay-300 inline-block ml-2">Thrive on campus.</span>
-                </div>
-              </div>
-            </div>
-            
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white mb-6 animate-fade-in-up leading-tight">
-              {slides[currentSlide].title}
-            </h1>
-            
-            <p className="text-xl sm:text-2xl text-white/90 mb-8 animate-fade-in-up animation-delay-200 max-w-3xl mx-auto">
-              {slides[currentSlide].description}
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-up animation-delay-300">
-              <StarBorder color="#FFFFFF">
-                <Link
-                  to="/app"
-                  className="bg-white text-[#0038FF] px-8 py-4 rounded-xl font-bold text-lg hover:bg-opacity-90 transition duration-300 flex items-center justify-center shadow-xl"
-                >
-                  Go to App
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Link>
-              </StarBorder>
-              
+            <div className="flex items-center space-x-4">
               <button
                 onClick={() => setShowLearnMore(true)}
-                className="bg-transparent border-2 border-white text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-white/10 transition duration-300 backdrop-blur-sm"
+                className="text-[#0F2557] hover:text-[#0A1B3D] font-medium"
               >
-                Learn More
+                About Us
+              </button>
+              <button
+                onClick={handleGoToApp}
+                className="bg-gradient-to-r from-[#0F2557] to-[#0A1B3D] text-white px-4 py-2 rounded-lg font-semibold hover:opacity-90 transition duration-200 shadow-md flex items-center"
+              >
+                Go to App
+                <ArrowRight className="ml-2 w-4 h-4" />
               </button>
             </div>
           </div>
         </div>
+      </header>
 
-        {/* Slide Indicators */}
-        <div className="absolute bottom-10 left-0 right-0 flex justify-center gap-2 z-30">
-          {slides.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentSlide(index)}
-              className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                currentSlide === index
-                  ? "bg-white w-10"
-                  : "bg-white/50 hover:bg-white/80"
-              }`}
-              aria-label={`Go to slide ${index + 1}`}
-            />
-          ))}
-        </div>
-
-        {/* Scroll indicator */}
-        <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-30 animate-bounce-custom">
-          <div className="w-8 h-12 rounded-full border-2 border-white flex items-start justify-center p-1">
-            <div className="w-1 h-3 bg-white rounded-full animate-fade-in"></div>
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section id="features" className={`py-20 bg-white transition-all duration-1000 transform ${isVisible.features ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-16">
-            <div className="inline-block mb-4">
-              <div className="relative">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
-                  <Zap className="w-8 h-8 text-[#0038FF]" />
+      {/* Hero Section */}
+      <section className="relative z-10 pt-16 pb-20 md:pt-24 md:pb-32 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row items-center">
+            <div className="md:w-1/2 md:pr-12 mb-10 md:mb-0">
+              <div className={`transition-all duration-1000 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-[#0F2557] leading-tight mb-6">
+                  Campus Tasks,{" "}
+                  <span className="text-[#FA4616]">Simplified</span>
+                </h1>
+                
+                {/* Animated tagline */}
+                <div className="relative h-12 mb-6 overflow-hidden">
+                  <div className="absolute animate-pulse">
+                    <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-[#0F2557] to-[#FA4616] text-transparent bg-clip-text">
+                      Connect. Help. Thrive on campus.
+                    </h2>
+                  </div>
                 </div>
-                <div className="absolute -inset-2 bg-blue-100/50 rounded-full blur-xl -z-10 animate-pulse-custom"></div>
+                
+                <p className="text-lg text-gray-600 mb-8">
+                  The student-to-student marketplace for quick tasks and errands on campus. 
+                  Get help with coffee runs, printing, food delivery, and more!
+                </p>
+                <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                  <button
+                    onClick={handleGoToApp}
+                    className="bg-gradient-to-r from-[#FA4616] to-[#E63A0B] text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition duration-200 shadow-lg flex items-center justify-center group"
+                  >
+                    <Zap className="mr-2 w-5 h-5" />
+                    Get Started
+                    <ArrowRight className="ml-2 w-5 h-5 transform group-hover:translate-x-1 transition-transform" />
+                  </button>
+                  <button
+                    onClick={() => setShowLearnMore(true)}
+                    className="bg-white border-2 border-[#0F2557] text-[#0F2557] px-6 py-3 rounded-lg font-semibold hover:bg-gray-50 transition duration-200 flex items-center justify-center"
+                  >
+                    Learn More
+                  </button>
+                </div>
               </div>
             </div>
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4 animate-fade-in">
-              Campus Life, Simplified
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto animate-fade-in animation-delay-200">
-              Hustl connects students to help each other with everyday tasks
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-blue-100/50 animate-fade-in animation-delay-200">
-              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center mb-6 shadow-lg animate-bounce-custom" style={{ animationDuration: '3s' }}>
-                <Coffee className="w-8 h-8 text-white" />
+            <div className="md:w-1/2 relative">
+              <div className={`transition-all duration-1000 delay-300 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+                <div className="relative">
+                  <div className="absolute -top-6 -left-6 w-24 h-24 bg-[#FA4616] rounded-full opacity-20 animate-pulse"></div>
+                  <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-[#0F2557] rounded-full opacity-20 animate-pulse" style={{ animationDelay: '1s' }}></div>
+                  <img
+                    src="https://images.pexels.com/photos/3184338/pexels-photo-3184338.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+                    alt="Students collaborating on campus"
+                    className="rounded-2xl shadow-2xl w-full object-cover h-[400px]"
+                  />
+                </div>
+                <div className="absolute -bottom-5 -right-5 bg-white p-4 rounded-lg shadow-lg max-w-xs">
+                  <div className="flex items-center">
+                    <div className="bg-green-100 p-2 rounded-full">
+                      <Shield className="w-6 h-6 text-green-600" />
+                    </div>
+                    <div className="ml-3">
+                      <p className="text-sm font-semibold">Verified UF Students</p>
+                      <p className="text-xs text-gray-500">Safe & Secure Platform</p>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <h3 className="text-xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">Coffee & Food Runs</h3>
-              <p className="text-gray-600">
-                Need coffee during a study session? Get it delivered right to your spot in the library.
-              </p>
-            </div>
-
-            <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-orange-100/50 animate-fade-in animation-delay-300">
-              <div className="w-16 h-16 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center mb-6 shadow-lg animate-bounce-custom" style={{ animationDuration: '4s', animationDelay: '0.5s' }}>
-                <Book className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-orange-600 to-red-600">Academic Help</h3>
-              <p className="text-gray-600">
-                Get notes when you miss class, find study partners, or get textbooks delivered.
-              </p>
-            </div>
-
-            <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-green-100/50 animate-fade-in animation-delay-400">
-              <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center mb-6 shadow-lg animate-bounce-custom" style={{ animationDuration: '3.5s', animationDelay: '1s' }}>
-                <DollarSign className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-green-600 to-emerald-600">Earn Between Classes</h3>
-              <p className="text-gray-600">
-                Turn your free time into income by helping fellow students with quick tasks.
-              </p>
             </div>
           </div>
         </div>
       </section>
 
       {/* How It Works Section */}
-      <section id="howItWorks" className={`py-20 bg-gradient-to-b from-gray-50 to-white transition-all duration-1000 transform ${isVisible.howItWorks ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'} relative overflow-hidden`}>
-        {/* Background elements */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full bg-blue-500/5 mix-blend-multiply filter blur-3xl"></div>
-          <div className="absolute bottom-1/4 right-1/4 w-64 h-64 rounded-full bg-orange-500/5 mix-blend-multiply filter blur-3xl"></div>
-        </div>
-
-        <div className="container mx-auto px-6 relative z-10">
+      <section className="relative z-10 py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <div className="inline-block mb-4">
-              <div className="relative">
-                <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center">
-                  <Clock className="w-8 h-8 text-indigo-600" />
-                </div>
-                <div className="absolute -inset-2 bg-indigo-100/50 rounded-full blur-xl -z-10 animate-pulse-custom"></div>
-              </div>
-            </div>
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4 animate-fade-in">
-              How Hustl Works
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto animate-fade-in animation-delay-200">
-              Getting help or earning money is simple
+            <h2 className="text-3xl md:text-4xl font-bold text-[#0F2557] mb-4">How Hustl Works</h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Our platform connects students who need help with those who can provide it, creating a vibrant campus community.
             </p>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            <div className="text-center animate-fade-in animation-delay-200">
-              <div className="relative">
-                <div className="w-20 h-20 bg-gradient-to-r from-[#0038FF] to-[#0021A5] rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl">
-                  <span className="text-2xl font-bold text-white">1</span>
-                </div>
-                <div className="absolute -inset-4 bg-blue-400/20 rounded-full blur-xl -z-10 animate-pulse-custom"></div>
-                <div className="hidden md:block absolute top-10 left-full w-full h-0.5 bg-gradient-to-r from-[#0038FF] to-transparent"></div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-100 transform transition duration-500 hover:scale-105">
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-6 mx-auto">
+                <Users className="w-8 h-8 text-[#0F2557]" />
               </div>
-              <h3 className="text-xl font-bold mb-3 bg-clip-text text-transparent bg-gradient-to-r from-[#0038FF] to-[#0021A5]">Post Your Task</h3>
-              <p className="text-gray-600">
-                Describe what you need, set your budget, and choose a location
+              <h3 className="text-xl font-bold text-center mb-4">Post Your Task</h3>
+              <p className="text-gray-600 text-center">
+                Describe what you need help with, set your budget, and choose a location on campus.
               </p>
             </div>
-
-            <div className="text-center animate-fade-in animation-delay-300">
-              <div className="relative">
-                <div className="w-20 h-20 bg-gradient-to-r from-[#0038FF] to-[#0021A5] rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl">
-                  <span className="text-2xl font-bold text-white">2</span>
-                </div>
-                <div className="absolute -inset-4 bg-blue-400/20 rounded-full blur-xl -z-10 animate-pulse-custom"></div>
-                <div className="hidden md:block absolute top-10 left-full w-full h-0.5 bg-gradient-to-r from-[#0038FF] to-transparent"></div>
+            
+            <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-100 transform transition duration-500 hover:scale-105">
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-6 mx-auto">
+                <MessageSquare className="w-8 h-8 text-[#0F2557]" />
               </div>
-              <h3 className="text-xl font-bold mb-3 bg-clip-text text-transparent bg-gradient-to-r from-[#0038FF] to-[#0021A5]">Get Matched</h3>
-              <p className="text-gray-600">
-                Connect with verified students nearby who can help
+              <h3 className="text-xl font-bold text-center mb-4">Get Connected</h3>
+              <p className="text-gray-600 text-center">
+                A fellow student accepts your task and communicates with you through our secure chat.
               </p>
             </div>
-
-            <div className="text-center animate-fade-in animation-delay-400">
-              <div className="relative">
-                <div className="w-20 h-20 bg-gradient-to-r from-[#0038FF] to-[#0021A5] rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl">
-                  <span className="text-2xl font-bold text-white">3</span>
-                </div>
-                <div className="absolute -inset-4 bg-blue-400/20 rounded-full blur-xl -z-10 animate-pulse-custom"></div>
+            
+            <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-100 transform transition duration-500 hover:scale-105">
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-6 mx-auto">
+                <Star className="w-8 h-8 text-[#0F2557]" />
               </div>
-              <h3 className="text-xl font-bold mb-3 bg-clip-text text-transparent bg-gradient-to-r from-[#0038FF] to-[#0021A5]">Complete & Pay</h3>
+              <h3 className="text-xl font-bold text-center mb-4">Task Completed</h3>
+              <p className="text-gray-600 text-center">
+                Once your task is done, payment is processed securely, and you can leave a review.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="relative z-10 py-16 bg-gradient-to-b from-blue-50 to-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-[#0F2557] mb-4">Why Choose Hustl</h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Built by students, for students, with features designed specifically for campus life.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100 hover:shadow-xl transition-shadow">
+              <Shield className="w-10 h-10 text-[#0F2557] mb-4" />
+              <h3 className="text-xl font-bold mb-2">Safe & Secure</h3>
               <p className="text-gray-600">
-                Task completed, payment processed securely through the app
+                Verified student accounts, secure payments, and built-in safety features.
+              </p>
+            </div>
+            
+            <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100 hover:shadow-xl transition-shadow">
+              <DollarSign className="w-10 h-10 text-[#0F2557] mb-4" />
+              <h3 className="text-xl font-bold mb-2">Earn Money</h3>
+              <p className="text-gray-600">
+                Make money between classes by helping fellow students with tasks.
+              </p>
+            </div>
+            
+            <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100 hover:shadow-xl transition-shadow">
+              <Zap className="w-10 h-10 text-[#0F2557] mb-4" />
+              <h3 className="text-xl font-bold mb-2">Quick & Easy</h3>
+              <p className="text-gray-600">
+                Intuitive interface makes it simple to post or find tasks in seconds.
+              </p>
+            </div>
+            
+            <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100 hover:shadow-xl transition-shadow">
+              <Users className="w-10 h-10 text-[#0F2557] mb-4" />
+              <h3 className="text-xl font-bold mb-2">Campus Community</h3>
+              <p className="text-gray-600">
+                Connect with fellow students and build a stronger campus network.
               </p>
             </div>
           </div>
@@ -352,159 +286,63 @@ const LandingPage = () => {
       </section>
 
       {/* Testimonials Section */}
-      <section id="testimonials" className={`py-20 bg-gradient-to-r from-[#0038FF] to-[#0021A5] text-white transition-all duration-1000 transform ${isVisible.testimonials ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'} relative overflow-hidden`}>
-        {/* Animated background elements */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-white opacity-5 rounded-full transform -translate-x-1/4 -translate-y-1/4"></div>
-          <div className="absolute bottom-0 left-0 w-96 h-96 bg-white opacity-5 rounded-full transform translate-x-1/4 translate-y-1/4"></div>
-          {[...Array(10)].map((_, i) => (
-            <div 
-              key={i}
-              className="absolute rounded-full bg-white/10 animate-pulse-custom"
-              style={{
-                width: `${Math.random() * 20 + 10}px`,
-                height: `${Math.random() * 20 + 10}px`,
-                top: `${Math.random() * 100}%`,
-                left: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 5}s`,
-                animationDuration: `${Math.random() * 3 + 2}s`
-              }}
-            ></div>
-          ))}
-        </div>
-
-        <div className="container mx-auto px-6 relative z-10">
-          <div className="text-center mb-16 animate-fade-in">
-            <div className="inline-block mb-4">
-              <div className="relative">
-                <div className="w-16 h-16 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center">
-                  <Star className="w-8 h-8 text-yellow-400" />
-                </div>
-                <div className="absolute -inset-2 bg-yellow-400/20 rounded-full blur-xl -z-10 animate-pulse-custom"></div>
-              </div>
-            </div>
-            <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-              What Students Are Saying
-            </h2>
-            <p className="text-xl text-blue-100 max-w-3xl mx-auto">
-              Join thousands of students already using Hustl
+      <section className="relative z-10 py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-[#0F2557] mb-4">What Students Say</h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Hear from students who are already using Hustl on campus.
             </p>
           </div>
-
-          <div className="max-w-4xl mx-auto relative">
-            <div className="overflow-hidden rounded-2xl shadow-2xl">
-              <div className="flex transition-transform duration-500 ease-in-out" style={{ transform: `translateX(-${currentTestimonial * 100}%)` }}>
-                {testimonials.map((testimonial, index) => (
-                  <div key={index} className="w-full flex-shrink-0 px-4">
-                    <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
-                      <div className="flex items-center mb-6">
-                        <div className="relative">
-                          <img 
-                            src={testimonial.image} 
-                            alt={testimonial.name} 
-                            className="w-16 h-16 rounded-full object-cover border-2 border-white"
-                          />
-                          <div className="absolute -inset-1 bg-white/30 rounded-full blur-md -z-10"></div>
-                        </div>
-                        <div className="ml-4">
-                          <h3 className="text-xl font-bold">{testimonial.name}</h3>
-                          <p className="text-blue-200">{testimonial.major}</p>
-                        </div>
-                      </div>
-                      <div className="flex mb-4">
-                        {[...Array(5)].map((_, i) => (
-                          <Star key={i} className="w-5 h-5 text-yellow-400 fill-yellow-400" />
-                        ))}
-                      </div>
-                      <p className="text-lg italic leading-relaxed">"{testimonial.quote}"</p>
-                    </div>
+          
+          <div className="relative max-w-4xl mx-auto">
+            <div className="bg-gradient-to-r from-[#0F2557] to-[#0A1B3D] rounded-2xl p-8 shadow-xl">
+              <div className="flex flex-col md:flex-row items-center">
+                <div className="md:w-1/3 mb-6 md:mb-0 flex justify-center">
+                  <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-white">
+                    <img 
+                      src={testimonials[currentTestimonial].image} 
+                      alt={testimonials[currentTestimonial].name} 
+                      className="w-full h-full object-cover"
+                    />
                   </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="flex justify-center mt-8 gap-2">
-              {testimonials.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentTestimonial(index)}
-                  className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                    currentTestimonial === index
-                      ? "bg-white w-10"
-                      : "bg-white/50 hover:bg-white/80"
-                  }`}
-                  aria-label={`Go to testimonial ${index + 1}`}
-                />
-              ))}
-            </div>
-
-            <button
-              onClick={() => setCurrentTestimonial((prev) => (prev === 0 ? testimonials.length - 1 : prev - 1))}
-              className="absolute top-1/2 left-0 -translate-y-1/2 -translate-x-6 bg-white/20 hover:bg-white/30 rounded-full p-2 backdrop-blur-sm transition-colors shadow-lg"
-              aria-label="Previous testimonial"
-            >
-              <ChevronLeft className="w-6 h-6" />
-            </button>
-
-            <button
-              onClick={() => setCurrentTestimonial((prev) => (prev === testimonials.length - 1 ? 0 : prev + 1))}
-              className="absolute top-1/2 right-0 -translate-y-1/2 translate-x-6 bg-white/20 hover:bg-white/30 rounded-full p-2 backdrop-blur-sm transition-colors shadow-lg"
-              aria-label="Next testimonial"
-            >
-              <ChevronRight className="w-6 h-6" />
-            </button>
-          </div>
-        </div>
-      </section>
-
-      {/* Our Mission Section */}
-      <section id="mission" className={`py-20 bg-white transition-all duration-1000 transform ${isVisible.mission ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'} relative overflow-hidden`}>
-        {/* Background elements */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-1/4 right-1/4 w-64 h-64 rounded-full bg-blue-500/5 mix-blend-multiply filter blur-3xl"></div>
-          <div className="absolute bottom-1/4 left-1/4 w-64 h-64 rounded-full bg-orange-500/5 mix-blend-multiply filter blur-3xl"></div>
-        </div>
-
-        <div className="container mx-auto px-6 relative z-10">
-          <div className="max-w-5xl mx-auto">
-            <div className="text-center mb-16 animate-fade-in">
-              <div className="inline-block mb-4">
-                <div className="relative">
-                  <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center">
-                    <Award className="w-8 h-8 text-purple-600" />
+                </div>
+                <div className="md:w-2/3 md:pl-8 text-white">
+                  <div className="mb-4">
+                    <svg className="w-10 h-10 text-[#FA4616] opacity-50" fill="currentColor" viewBox="0 0 32 32">
+                      <path d="M9.352 4C4.456 7.456 1 13.12 1 19.36c0 5.088 3.072 8.064 6.624 8.064 3.36 0 5.856-2.688 5.856-5.856 0-3.168-2.208-5.472-5.088-5.472-.576 0-1.344.096-1.536.192.48-3.264 3.552-7.104 6.624-9.024L9.352 4zm16.512 0c-4.8 3.456-8.256 9.12-8.256 15.36 0 5.088 3.072 8.064 6.624 8.064 3.264 0 5.856-2.688 5.856-5.856 0-3.168-2.304-5.472-5.184-5.472-.576 0-1.248.096-1.44.192.48-3.264 3.456-7.104 6.528-9.024L25.864 4z" />
+                    </svg>
                   </div>
-                  <div className="absolute -inset-2 bg-purple-100/50 rounded-full blur-xl -z-10 animate-pulse-custom"></div>
+                  <p className="text-xl italic mb-6">{testimonials[currentTestimonial].quote}</p>
+                  <div>
+                    <p className="font-bold text-lg">{testimonials[currentTestimonial].name}</p>
+                    <p className="text-blue-200">{testimonials[currentTestimonial].role}</p>
+                  </div>
                 </div>
               </div>
-              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-                Our Mission
-              </h2>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                Building a stronger campus community through connection and collaboration
-              </p>
-            </div>
-
-            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-8 md:p-12 shadow-2xl border border-blue-100/50 animate-scale-in">
-              <div className="prose prose-lg max-w-none text-gray-700">
-                <p className="mb-6 animate-fade-in animation-delay-200">
-                  At Hustl, we believe in the power of community and the untapped potential of student collaboration. Our mission is to create a platform where students can help each other navigate the challenges of campus life while building meaningful connections.
-                </p>
-                
-                <p className="mb-6 animate-fade-in animation-delay-300">
-                  Founded by a diverse team of students who experienced firsthand the everyday hurdles of university life, Hustl was born from a simple observation: students have complementary needs and abilities, but lack an efficient way to connect.
-                </p>
-                
-                <p className="mb-6 animate-fade-in animation-delay-400">
-                  Whether it's getting coffee delivered during an intense study session, finding someone to pick up class materials when you're sick, or earning extra money between classes by helping fellow students, Hustl makes these connections possible.
-                </p>
-                
-                <p className="mb-6 animate-fade-in animation-delay-500">
-                  We're more than just a task marketplace—we're building a collaborative ecosystem where students support each other through the unique challenges of university life. By connecting those who need help with those who can provide it, we're fostering a more connected, efficient, and supportive campus community.
-                </p>
-                
-                <p className="animate-fade-in animation-delay-500">
-                  Our team is committed to creating a platform that is safe, inclusive, and beneficial for all students. We prioritize user safety, fair compensation, and positive community interactions in everything we build.
-                </p>
+              
+              <div className="flex justify-center mt-8">
+                <button 
+                  onClick={() => setCurrentTestimonial((prev) => (prev === 0 ? testimonials.length - 1 : prev - 1))}
+                  className="mx-2 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+                >
+                  <ChevronLeft className="w-5 h-5 text-white" />
+                </button>
+                {testimonials.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentTestimonial(index)}
+                    className={`mx-1 w-3 h-3 rounded-full transition-colors ${
+                      currentTestimonial === index ? "bg-[#FA4616]" : "bg-white/30 hover:bg-white/50"
+                    }`}
+                  />
+                ))}
+                <button 
+                  onClick={() => setCurrentTestimonial((prev) => (prev === testimonials.length - 1 ? 0 : prev + 1))}
+                  className="mx-2 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+                >
+                  <ChevronRight className="w-5 h-5 text-white" />
+                </button>
               </div>
             </div>
           </div>
@@ -512,429 +350,183 @@ const LandingPage = () => {
       </section>
 
       {/* Tech Stack Section */}
-      <section id="techStack" className={`py-20 bg-gradient-to-b from-gray-50 to-white transition-all duration-1000 transform ${isVisible.techStack ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'} relative overflow-hidden`}>
-        {/* Background elements */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-1/3 left-1/3 w-64 h-64 rounded-full bg-blue-500/5 mix-blend-multiply filter blur-3xl"></div>
-          <div className="absolute bottom-1/3 right-1/3 w-64 h-64 rounded-full bg-purple-500/5 mix-blend-multiply filter blur-3xl"></div>
-        </div>
-
-        <div className="container mx-auto px-6 relative z-10">
-          <div className="text-center mb-16 animate-fade-in">
-            <div className="inline-block mb-4">
-              <div className="relative">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
-                  <Briefcase className="w-8 h-8 text-green-600" />
-                </div>
-                <div className="absolute -inset-2 bg-green-100/50 rounded-full blur-xl -z-10 animate-pulse-custom"></div>
-              </div>
-            </div>
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              Our Technology
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Built with modern tools for reliability, security, and performance
+      <section className="relative z-10 py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-[#0F2557] mb-4">Our Tech Stack</h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Built with modern technologies for a seamless experience
             </p>
           </div>
-
-          <div className="max-w-5xl mx-auto">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-16">
-              {/* Firebase */}
-              <div className="flex flex-col items-center transform transition-all duration-500 hover:scale-105 animate-fade-in animation-delay-200">
-                <div className="h-16 flex items-center justify-center mb-4 relative">
-                  <img 
-                    src="https://firebase.google.com/downloads/brand-guidelines/PNG/logo-logomark.png" 
-                    alt="Firebase" 
-                    className="h-16 object-contain"
-                  />
-                  <div className="absolute -inset-2 bg-yellow-400/10 rounded-full blur-xl -z-10 opacity-0 hover:opacity-100 transition-opacity"></div>
-                </div>
-                <h3 className="font-bold text-center">Firebase</h3>
-                <p className="text-sm text-gray-500 text-center">Backend & Auth</p>
-              </div>
-
-              {/* React */}
-              <div className="flex flex-col items-center transform transition-all duration-500 hover:scale-105 animate-fade-in animation-delay-300">
-                <div className="h-16 flex items-center justify-center mb-4 relative">
-                  <img 
-                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/1200px-React-icon.svg.png" 
-                    alt="React" 
-                    className="h-16 object-contain"
-                  />
-                  <div className="absolute -inset-2 bg-blue-400/10 rounded-full blur-xl -z-10 opacity-0 hover:opacity-100 transition-opacity"></div>
-                </div>
-                <h3 className="font-bold text-center">React</h3>
-                <p className="text-sm text-gray-500 text-center">Frontend Framework</p>
-              </div>
-
-              {/* Tailwind CSS */}
-              <div className="flex flex-col items-center transform transition-all duration-500 hover:scale-105 animate-fade-in animation-delay-400">
-                <div className="h-16 flex items-center justify-center mb-4 relative">
-                  <img 
-                    src="https://tailwindcss.com/_next/static/media/tailwindcss-mark.3c5441fc7a190fb1800d4a5c7f07ba4b1345a9c8.svg" 
-                    alt="Tailwind CSS" 
-                    className="h-12 object-contain"
-                  />
-                  <div className="absolute -inset-2 bg-teal-400/10 rounded-full blur-xl -z-10 opacity-0 hover:opacity-100 transition-opacity"></div>
-                </div>
-                <h3 className="font-bold text-center">Tailwind CSS</h3>
-                <p className="text-sm text-gray-500 text-center">Styling</p>
-              </div>
-
-              {/* TypeScript */}
-              <div className="flex flex-col items-center transform transition-all duration-500 hover:scale-105 animate-fade-in animation-delay-500">
-                <div className="h-16 flex items-center justify-center mb-4 relative">
-                  <img 
-                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Typescript_logo_2020.svg/1200px-Typescript_logo_2020.svg.png" 
-                    alt="TypeScript" 
-                    className="h-14 object-contain"
-                  />
-                  <div className="absolute -inset-2 bg-blue-400/10 rounded-full blur-xl -z-10 opacity-0 hover:opacity-100 transition-opacity"></div>
-                </div>
-                <h3 className="font-bold text-center">TypeScript</h3>
-                <p className="text-sm text-gray-500 text-center">Type Safety</p>
-              </div>
-
-              {/* Vite */}
-              <div className="flex flex-col items-center transform transition-all duration-500 hover:scale-105 animate-fade-in animation-delay-200">
-                <div className="h-16 flex items-center justify-center mb-4 relative">
-                  <img 
-                    src="https://vitejs.dev/logo-with-shadow.png" 
-                    alt="Vite" 
-                    className="h-16 object-contain"
-                  />
-                  <div className="absolute -inset-2 bg-purple-400/10 rounded-full blur-xl -z-10 opacity-0 hover:opacity-100 transition-opacity"></div>
-                </div>
-                <h3 className="font-bold text-center">Vite</h3>
-                <p className="text-sm text-gray-500 text-center">Build Tool</p>
-              </div>
-
-              {/* Google Maps */}
-              <div className="flex flex-col items-center transform transition-all duration-500 hover:scale-105 animate-fade-in animation-delay-300">
-                <div className="h-16 flex items-center justify-center mb-4 relative">
-                  <img 
-                    src="https://developers.google.com/static/maps/images/maps-icon.svg" 
-                    alt="Google Maps" 
-                    className="h-14 object-contain"
-                  />
-                  <div className="absolute -inset-2 bg-green-400/10 rounded-full blur-xl -z-10 opacity-0 hover:opacity-100 transition-opacity"></div>
-                </div>
-                <h3 className="font-bold text-center">Google Maps</h3>
-                <p className="text-sm text-gray-500 text-center">Location Services</p>
-              </div>
-
-              {/* Stripe */}
-              <div className="flex flex-col items-center transform transition-all duration-500 hover:scale-105 animate-fade-in animation-delay-400">
-                <div className="h-16 flex items-center justify-center mb-4 relative">
-                  <img 
-                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Stripe_Logo%2C_revised_2016.svg/2560px-Stripe_Logo%2C_revised_2016.svg.png" 
-                    alt="Stripe" 
-                    className="h-10 object-contain"
-                  />
-                  <div className="absolute -inset-2 bg-purple-400/10 rounded-full blur-xl -z-10 opacity-0 hover:opacity-100 transition-opacity"></div>
-                </div>
-                <h3 className="font-bold text-center">Stripe</h3>
-                <p className="text-sm text-gray-500 text-center">Payments</p>
-              </div>
-
-              {/* Sentry */}
-              <div className="flex flex-col items-center transform transition-all duration-500 hover:scale-105 animate-fade-in animation-delay-500">
-                <div className="h-16 flex items-center justify-center mb-4 relative">
-                  <img 
-                    src="https://seeklogo.com/images/S/sentry-logo-36928B74C1-seeklogo.com.png" 
-                    alt="Sentry" 
-                    className="h-14 object-contain"
-                  />
-                  <div className="absolute -inset-2 bg-red-400/10 rounded-full blur-xl -z-10 opacity-0 hover:opacity-100 transition-opacity"></div>
-                </div>
-                <h3 className="font-bold text-center">Sentry</h3>
-                <p className="text-sm text-gray-500 text-center">Error Monitoring</p>
-              </div>
+          
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 items-center justify-items-center">
+            {/* React */}
+            <div className="flex flex-col items-center">
+              <img 
+                src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/1200px-React-icon.svg.png" 
+                alt="React" 
+                className="h-16 object-contain mb-3" 
+              />
+              <p className="font-medium">React</p>
+            </div>
+            
+            {/* Firebase */}
+            <div className="flex flex-col items-center">
+              <img 
+                src="https://firebase.google.com/static/images/brand-guidelines/logo-logomark.png" 
+                alt="Firebase" 
+                className="h-16 object-contain mb-3" 
+              />
+              <p className="font-medium">Firebase</p>
+            </div>
+            
+            {/* TailwindCSS */}
+            <div className="flex flex-col items-center">
+              <img 
+                src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Tailwind_CSS_Logo.svg/2048px-Tailwind_CSS_Logo.svg.png" 
+                alt="TailwindCSS" 
+                className="h-16 object-contain mb-3" 
+              />
+              <p className="font-medium">TailwindCSS</p>
+            </div>
+            
+            {/* TypeScript */}
+            <div className="flex flex-col items-center">
+              <img 
+                src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Typescript_logo_2020.svg/1200px-Typescript_logo_2020.svg.png" 
+                alt="TypeScript" 
+                className="h-16 object-contain mb-3" 
+              />
+              <p className="font-medium">TypeScript</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* University Partners Section */}
-      <section id="partners" className={`py-20 bg-white transition-all duration-1000 transform ${isVisible.partners ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'} relative overflow-hidden`}>
-        {/* Background elements */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-1/4 right-1/4 w-64 h-64 rounded-full bg-orange-500/5 mix-blend-multiply filter blur-3xl"></div>
-          <div className="absolute bottom-1/4 left-1/4 w-64 h-64 rounded-full bg-blue-500/5 mix-blend-multiply filter blur-3xl"></div>
-        </div>
-
-        <div className="container mx-auto px-6 relative z-10">
-          <div className="text-center mb-16 animate-fade-in">
-            <div className="inline-block mb-4">
-              <div className="relative">
-                <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center">
-                  <Building className="w-8 h-8 text-orange-600" />
-                </div>
-                <div className="absolute -inset-2 bg-orange-100/50 rounded-full blur-xl -z-10 animate-pulse-custom"></div>
-              </div>
-            </div>
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              University Partners
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Bringing Hustl to campuses across the country
+      {/* University Partners */}
+      <section className="relative z-10 py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-[#0F2557] mb-4">University Partners</h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Hustl is expanding to campuses across the country
             </p>
           </div>
-
-          <div className="max-w-5xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {/* University of Florida */}
-              <div className="bg-gradient-to-br from-blue-50 to-orange-50 rounded-xl p-8 shadow-2xl border border-blue-100/50 flex flex-col items-center transform transition-all duration-500 hover:scale-105 animate-fade-in animation-delay-200">
-                <div className="h-24 flex items-center justify-center mb-6 relative">
-                  <img 
-                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/University_of_Florida_logo.svg/1280px-University_of_Florida_logo.svg.png" 
-                    alt="University of Florida" 
-                    className="h-20 object-contain"
-                  />
-                  <div className="absolute -inset-4 bg-blue-400/10 rounded-full blur-xl -z-10 animate-pulse-custom"></div>
-                </div>
-                <h3 className="text-xl font-bold mb-2 text-center">University of Florida</h3>
-                <p className="text-gray-600 text-center">
-                  Our founding campus and first university partner
-                </p>
-                <div className="mt-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-1 rounded-full text-sm font-medium shadow-lg">
-                  Active
-                </div>
+          
+          <div className="flex flex-col md:flex-row items-center justify-center gap-8">
+            <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100 hover:shadow-xl transition-shadow">
+              <img 
+                src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/University_of_Florida_logo.svg/1280px-University_of_Florida_logo.svg.png" 
+                alt="University of Florida" 
+                className="h-16 object-contain mb-3" 
+              />
+              <p className="font-medium text-center">University of Florida</p>
+            </div>
+            
+            <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100 hover:shadow-xl transition-shadow">
+              <div className="h-16 flex items-center justify-center mb-3">
+                <p className="text-gray-400 font-medium">Coming Soon</p>
               </div>
-
-              {/* Coming Soon */}
-              <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-8 shadow-lg border border-gray-200/50 flex flex-col items-center transform transition-all duration-500 hover:scale-105 animate-fade-in animation-delay-300">
-                <div className="h-24 flex items-center justify-center mb-6 relative">
-                  <Building className="w-16 h-16 text-gray-400" />
-                  <div className="absolute -inset-4 bg-gray-400/10 rounded-full blur-xl -z-10 animate-pulse-custom"></div>
-                </div>
-                <h3 className="text-xl font-bold mb-2 text-center">More Universities</h3>
-                <p className="text-gray-600 text-center">
-                  We're expanding to more campuses soon
-                </p>
-                <div className="mt-4 bg-gradient-to-r from-gray-500 to-gray-600 text-white px-4 py-1 rounded-full text-sm font-medium shadow-lg">
-                  Coming Soon
-                </div>
-              </div>
+              <p className="font-medium text-center">More Universities</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* Business Inquiries Section */}
-      <section id="business" className={`py-20 bg-gradient-to-b from-gray-50 to-white transition-all duration-1000 transform ${isVisible.business ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'} relative overflow-hidden`}>
-        {/* Background elements */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-1/3 right-1/3 w-64 h-64 rounded-full bg-indigo-500/5 mix-blend-multiply filter blur-3xl"></div>
-          <div className="absolute bottom-1/3 left-1/3 w-64 h-64 rounded-full bg-green-500/5 mix-blend-multiply filter blur-3xl"></div>
-        </div>
-
-        <div className="container mx-auto px-6 relative z-10">
-          <div className="max-w-5xl mx-auto">
-            <div className="text-center mb-12 animate-fade-in">
-              <div className="inline-block mb-4">
-                <div className="relative">
-                  <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center">
-                    <Briefcase className="w-8 h-8 text-indigo-600" />
-                  </div>
-                  <div className="absolute -inset-2 bg-indigo-100/50 rounded-full blur-xl -z-10 animate-pulse-custom"></div>
-                </div>
+      <section className="relative z-10 py-16 bg-gradient-to-b from-white to-blue-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-[#0F2557] mb-4">Partner with Hustl</h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Bring Hustl to your university and transform campus life for your students
+            </p>
+          </div>
+          
+          <div className="max-w-2xl mx-auto bg-white rounded-xl p-8 shadow-xl border border-gray-100">
+            <h3 className="text-2xl font-bold text-[#0F2557] mb-6">Interested in bringing Hustl to your campus?</h3>
+            <form onSubmit={handleSubmitInquiry} className="space-y-4">
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-[#0F2557] focus:border-[#0F2557]"
+                  placeholder="your@email.edu"
+                  required
+                />
               </div>
-              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-                Partner with Hustl
-              </h2>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                Bring the power of student collaboration to your campus
-              </p>
-            </div>
-
-            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-8 md:p-12 shadow-2xl border border-blue-100/50 animate-scale-in">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-                <div className="animate-slide-in-left">
-                  <h3 className="text-2xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">For Universities</h3>
-                  <p className="text-gray-700 mb-6">
-                    Partner with Hustl to provide your students with a safe, efficient platform for campus collaboration. Our platform helps improve student life, increase campus engagement, and provide flexible earning opportunities.
-                  </p>
-                  <ul className="space-y-3 mb-6">
-                    <li className="flex items-start">
-                      <div className="bg-blue-100 p-1 rounded-full mr-2 mt-1">
-                        <Check className="w-4 h-4 text-blue-600" />
-                      </div>
-                      <span className="text-gray-700">Improve student satisfaction and retention</span>
-                    </li>
-                    <li className="flex items-start">
-                      <div className="bg-blue-100 p-1 rounded-full mr-2 mt-1">
-                        <Check className="w-4 h-4 text-blue-600" />
-                      </div>
-                      <span className="text-gray-700">Enhance campus community and engagement</span>
-                    </li>
-                    <li className="flex items-start">
-                      <div className="bg-blue-100 p-1 rounded-full mr-2 mt-1">
-                        <Check className="w-4 h-4 text-blue-600" />
-                      </div>
-                      <span className="text-gray-700">Provide flexible earning opportunities for students</span>
-                    </li>
-                  </ul>
-                </div>
-                
-                <div className="bg-white rounded-xl p-6 shadow-xl border border-gray-100 animate-slide-in-right">
-                  <h4 className="text-xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-[#0038FF] to-[#0021A5]">Business Inquiries</h4>
-                  <p className="text-gray-600 mb-6">
-                    Interested in bringing Hustl to your campus? Contact our partnerships team.
-                  </p>
-                  <a 
-                    href="mailto:partnerships@hustlapp.com"
-                    className="bg-gradient-to-r from-[#0038FF] to-[#0021A5] text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition duration-200 flex items-center justify-center shadow-lg"
-                  >
-                    <Mail className="w-5 h-5 mr-2" />
-                    Contact Partnerships
-                  </a>
-                </div>
-              </div>
-            </div>
+              <button
+                type="submit"
+                className="w-full bg-gradient-to-r from-[#0F2557] to-[#0A1B3D] text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition duration-200 shadow-md flex items-center justify-center"
+              >
+                <Mail className="mr-2 w-5 h-5" />
+                Contact Our Team
+              </button>
+            </form>
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-[#0038FF] to-[#0021A5] text-white relative overflow-hidden">
-        {/* Animated background elements */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-white opacity-5 rounded-full transform -translate-x-1/4 -translate-y-1/4"></div>
-          <div className="absolute bottom-0 left-0 w-96 h-96 bg-white opacity-5 rounded-full transform translate-x-1/4 translate-y-1/4"></div>
-          {[...Array(15)].map((_, i) => (
-            <div 
-              key={i}
-              className="absolute rounded-full bg-white/10 animate-pulse-custom"
-              style={{
-                width: `${Math.random() * 20 + 10}px`,
-                height: `${Math.random() * 20 + 10}px`,
-                top: `${Math.random() * 100}%`,
-                left: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 5}s`,
-                animationDuration: `${Math.random() * 3 + 2}s`
-              }}
-            ></div>
-          ))}
-        </div>
-
-        <div className="container mx-auto px-6 text-center relative z-10">
-          <div className="animate-fade-in">
-            <div className="inline-block mb-6">
-              <div className="relative">
-                <div className="w-20 h-20 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center">
-                  <Zap className="w-10 h-10 text-white" />
-                </div>
-                <div className="absolute -inset-2 bg-white/20 rounded-full blur-xl -z-10 animate-pulse-custom"></div>
-              </div>
-            </div>
-            <h2 className="text-3xl sm:text-5xl font-bold mb-6 animate-fade-in">
-              Join the Movement
-            </h2>
-            <p className="text-xl text-blue-100 max-w-3xl mx-auto mb-8 animate-fade-in animation-delay-200">
-              Be part of the revolution in campus collaboration. Connect, help, and earn with Hustl.
+      <section className="relative z-10 py-20 bg-gradient-to-r from-[#0F2557] to-[#0A1B3D] text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h2 className="text-3xl md:text-5xl font-bold mb-6">Join the Movement</h2>
+            <p className="text-xl text-blue-200 mb-8 max-w-2xl mx-auto">
+              Be part of the campus revolution that's connecting students and making campus life easier.
             </p>
-            <div className="animate-fade-in animation-delay-300">
-              <StarBorder color="#FFFFFF">
-                <Link
-                  to="/"
-                  className="bg-white text-[#0038FF] px-8 py-4 rounded-xl font-bold text-lg hover:bg-opacity-90 transition duration-300 inline-flex items-center shadow-xl"
-                >
-                  Join the Movement
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Link>
-              </StarBorder>
-            </div>
+            <button
+              onClick={handleGoToApp}
+              className="bg-gradient-to-r from-[#FA4616] to-[#E63A0B] text-white px-8 py-4 rounded-lg font-semibold text-lg hover:opacity-90 transition duration-200 shadow-lg flex items-center mx-auto group"
+            >
+              <Zap className="mr-2 w-6 h-6" />
+              Get Started Now
+              <ArrowRight className="ml-2 w-6 h-6 transform group-hover:translate-x-1 transition-transform" />
+            </button>
           </div>
         </div>
+        
+        {/* Animated elements */}
+        <div className="absolute top-0 left-0 w-40 h-40 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-blob"></div>
+        <div className="absolute bottom-0 right-0 w-40 h-40 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-blob animation-delay-2000"></div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12 relative overflow-hidden">
-        {/* Background elements */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500 opacity-5 rounded-full transform -translate-x-1/4 -translate-y-1/4"></div>
-          <div className="absolute bottom-0 left-0 w-96 h-96 bg-orange-500 opacity-5 rounded-full transform translate-x-1/4 translate-y-1/4"></div>
-        </div>
-
-        <div className="container mx-auto px-6 relative z-10">
+      <footer className="relative z-10 bg-white py-12 border-t border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="mb-6 md:mb-0 animate-fade-in">
-              <div className="relative">
-                <img 
-                  src="/files_5770123-1751251303321-image.png" 
-                  alt="Hustl Logo" 
-                  className="h-12 w-auto"
-                />
-                <div className="absolute -inset-1 bg-white/5 rounded-full blur-xl -z-10"></div>
-              </div>
-              <p className="mt-2 text-gray-400">
-                Campus tasks, simplified.
-              </p>
+            <div className="flex items-center mb-6 md:mb-0">
+              <img 
+                src="/files_5770123-1751251303321-image.png" 
+                alt="Hustl Logo" 
+                className="h-10 w-auto mr-2" 
+              />
+              <span className="text-xl font-bold text-[#0F2557]">Hustl</span>
             </div>
             
-            <div className="flex flex-wrap gap-8 animate-fade-in animation-delay-200">
-              <div>
-                <h3 className="font-bold mb-4 text-blue-300">Features</h3>
-                <ul className="space-y-2">
-                  <li><a href="#" className="text-gray-400 hover:text-white transition">Task Marketplace</a></li>
-                  <li><a href="#" className="text-gray-400 hover:text-white transition">Secure Payments</a></li>
-                  <li><a href="#" className="text-gray-400 hover:text-white transition">Safety Features</a></li>
-                </ul>
-              </div>
-              
-              <div>
-                <h3 className="font-bold mb-4 text-blue-300">Company</h3>
-                <ul className="space-y-2">
-                  <li><button onClick={() => setShowLearnMore(true)} className="text-gray-400 hover:text-white transition">About Us</button></li>
-                  <li><a href="#" className="text-gray-400 hover:text-white transition">Careers</a></li>
-                  <li><a href="#" className="text-gray-400 hover:text-white transition">Contact</a></li>
-                </ul>
-              </div>
-              
-              <div>
-                <h3 className="font-bold mb-4 text-blue-300">Legal</h3>
-                <ul className="space-y-2">
-                  <li><a href="#" className="text-gray-400 hover:text-white transition">Terms of Service</a></li>
-                  <li><a href="#" className="text-gray-400 hover:text-white transition">Privacy Policy</a></li>
-                </ul>
-              </div>
+            <div className="flex flex-wrap justify-center gap-6 mb-6 md:mb-0">
+              <a href="#" className="text-gray-600 hover:text-[#0F2557]">About</a>
+              <a href="#" className="text-gray-600 hover:text-[#0F2557]">Privacy</a>
+              <a href="#" className="text-gray-600 hover:text-[#0F2557]">Terms</a>
+              <a href="mailto:hustlapp@outlook.com" className="text-gray-600 hover:text-[#0F2557]">Contact</a>
             </div>
-          </div>
-          
-          <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400 animate-fade-in animation-delay-300">
-            <p>© {new Date().getFullYear()} Hustl. All rights reserved.</p>
+            
+            <div className="text-gray-500 text-sm">
+              © {new Date().getFullYear()} Hustl. All rights reserved.
+            </div>
           </div>
         </div>
       </footer>
 
       {/* Learn More Modal */}
       {showLearnMore && <LearnMoreModal onClose={() => setShowLearnMore(false)} />}
-
-      {/* Animated Background Elements */}
-      <div className="fixed top-0 left-0 w-full h-full pointer-events-none z-0 overflow-hidden">
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full bg-blue-500 mix-blend-multiply filter blur-3xl opacity-5 animate-float"></div>
-        <div className="absolute top-3/4 left-2/3 w-96 h-96 rounded-full bg-purple-500 mix-blend-multiply filter blur-3xl opacity-5 animate-float animation-delay-2000"></div>
-        <div className="absolute top-1/2 left-1/2 w-80 h-80 rounded-full bg-pink-500 mix-blend-multiply filter blur-3xl opacity-5 animate-float animation-delay-1000"></div>
-      </div>
     </div>
   );
 };
-
-// Check component for use in the LandingPage
-const Check = ({ className = "w-6 h-6" }) => (
-  <svg 
-    xmlns="http://www.w3.org/2000/svg" 
-    viewBox="0 0 24 24" 
-    fill="none" 
-    stroke="currentColor" 
-    strokeWidth="2" 
-    strokeLinecap="round" 
-    strokeLinejoin="round" 
-    className={className}
-  >
-    <polyline points="20 6 9 17 4 12"></polyline>
-  </svg>
-);
 
 export default LandingPage;
