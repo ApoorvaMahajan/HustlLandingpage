@@ -134,6 +134,17 @@ const LandingPage = () => {
               />
             </div>
             
+            {/* Animated Tagline */}
+            <div className="overflow-hidden mb-6">
+              <div className="flex justify-center">
+                <div className="text-xl sm:text-2xl md:text-3xl font-bold text-white bg-black/30 px-6 py-3 rounded-full backdrop-blur-sm">
+                  <span className="animate-fade-in-up inline-block">Connect.</span>
+                  <span className="animate-fade-in-up animation-delay-200 inline-block ml-2">Help.</span>
+                  <span className="animate-fade-in-up animation-delay-300 inline-block ml-2">Thrive on campus.</span>
+                </div>
+              </div>
+            </div>
+            
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white mb-6 animate-fade-in-up">
               {slides[currentSlide].title}
             </h1>
