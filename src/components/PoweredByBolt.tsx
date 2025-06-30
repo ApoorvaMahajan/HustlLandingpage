@@ -1,5 +1,4 @@
 import React from 'react';
-import { Zap } from 'lucide-react';
 
 interface PoweredByBoltProps {
   className?: string;
@@ -22,10 +21,13 @@ const PoweredByBolt: React.FC<PoweredByBoltProps> = ({
       href="https://bolt.new"
       target="_blank"
       rel="noopener noreferrer"
-      className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-300 bg-white/90 text-gray-800 hover:bg-blue-50 hover:text-blue-600 border border-gray-200 shadow-sm hover:shadow ${positionClasses[position]} ${className}`}
+      className={`inline-block transition-all duration-300 hover:opacity-90 ${positionClasses[position]} ${className}`}
     >
-      <Zap className="w-3.5 h-3.5 mr-1.5 text-blue-500" />
-      Powered by Bolt
+      <img 
+        src="/black_circle_360x360.png" 
+        alt="Powered by Bolt" 
+        className="w-12 h-12 rounded-full shadow-md hover:shadow-lg transition-shadow"
+      />
     </a>
   );
 };
