@@ -4,6 +4,7 @@ import { Toaster } from "react-hot-toast";
 import { auth } from "./lib/firebase";
 import LandingPage from "./components/LandingPage";
 import Dashboard from "./components/Dashboard";
+import PoweredByBolt from "./components/PoweredByBolt";
 
 function App() {
   const [user, setUser] = useState<any>(null);
@@ -33,6 +34,7 @@ function App() {
         <Route path="/" element={user ? <Navigate to="/app" /> : <LandingPage />} />
         <Route path="/app" element={user ? <Dashboard /> : <Navigate to="/" />} />
       </Routes>
+      <PoweredByBolt position="bottom-right" />
     </Router>
   );
 }
