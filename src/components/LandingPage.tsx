@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Coffee, Book, MapPin, Clock, DollarSign, Star, Shield, Users, Zap, MessageSquare, Award, ChevronRight, ChevronLeft } from "lucide-react";
+import { ArrowRight, Coffee, Book, MapPin, Clock, DollarSign, Star, Shield, Users, Zap, MessageSquare, Award, ChevronRight, ChevronLeft, Briefcase, Mail, Building } from "lucide-react";
 import { StarBorder } from "./ui/star-border";
 import LearnMoreModal from "./LearnMoreModal";
 
@@ -13,6 +13,9 @@ const LandingPage = () => {
     howItWorks: false,
     testimonials: false,
     mission: false,
+    techStack: false,
+    partners: false,
+    business: false,
   });
 
   const slides = [
@@ -392,21 +395,254 @@ const LandingPage = () => {
         </div>
       </section>
 
+      {/* Tech Stack Section */}
+      <section id="techStack" className={`py-20 bg-gradient-to-b from-gray-50 to-white transition-all duration-1000 transform ${isVisible.techStack ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+              Our Technology
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Built with modern tools for reliability, security, and performance
+            </p>
+          </div>
+
+          <div className="max-w-5xl mx-auto">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-16">
+              {/* Firebase */}
+              <div className="flex flex-col items-center">
+                <div className="h-16 flex items-center justify-center mb-4">
+                  <img 
+                    src="https://firebase.google.com/downloads/brand-guidelines/PNG/logo-logomark.png" 
+                    alt="Firebase" 
+                    className="h-16 object-contain"
+                  />
+                </div>
+                <h3 className="font-bold text-center">Firebase</h3>
+                <p className="text-sm text-gray-500 text-center">Backend & Auth</p>
+              </div>
+
+              {/* React */}
+              <div className="flex flex-col items-center">
+                <div className="h-16 flex items-center justify-center mb-4">
+                  <img 
+                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/1200px-React-icon.svg.png" 
+                    alt="React" 
+                    className="h-16 object-contain"
+                  />
+                </div>
+                <h3 className="font-bold text-center">React</h3>
+                <p className="text-sm text-gray-500 text-center">Frontend Framework</p>
+              </div>
+
+              {/* Tailwind CSS */}
+              <div className="flex flex-col items-center">
+                <div className="h-16 flex items-center justify-center mb-4">
+                  <img 
+                    src="https://tailwindcss.com/_next/static/media/tailwindcss-mark.3c5441fc7a190fb1800d4a5c7f07ba4b1345a9c8.svg" 
+                    alt="Tailwind CSS" 
+                    className="h-12 object-contain"
+                  />
+                </div>
+                <h3 className="font-bold text-center">Tailwind CSS</h3>
+                <p className="text-sm text-gray-500 text-center">Styling</p>
+              </div>
+
+              {/* TypeScript */}
+              <div className="flex flex-col items-center">
+                <div className="h-16 flex items-center justify-center mb-4">
+                  <img 
+                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Typescript_logo_2020.svg/1200px-Typescript_logo_2020.svg.png" 
+                    alt="TypeScript" 
+                    className="h-14 object-contain"
+                  />
+                </div>
+                <h3 className="font-bold text-center">TypeScript</h3>
+                <p className="text-sm text-gray-500 text-center">Type Safety</p>
+              </div>
+
+              {/* Vite */}
+              <div className="flex flex-col items-center">
+                <div className="h-16 flex items-center justify-center mb-4">
+                  <img 
+                    src="https://vitejs.dev/logo-with-shadow.png" 
+                    alt="Vite" 
+                    className="h-16 object-contain"
+                  />
+                </div>
+                <h3 className="font-bold text-center">Vite</h3>
+                <p className="text-sm text-gray-500 text-center">Build Tool</p>
+              </div>
+
+              {/* Google Maps */}
+              <div className="flex flex-col items-center">
+                <div className="h-16 flex items-center justify-center mb-4">
+                  <img 
+                    src="https://developers.google.com/static/maps/images/maps-icon.svg" 
+                    alt="Google Maps" 
+                    className="h-14 object-contain"
+                  />
+                </div>
+                <h3 className="font-bold text-center">Google Maps</h3>
+                <p className="text-sm text-gray-500 text-center">Location Services</p>
+              </div>
+
+              {/* Stripe */}
+              <div className="flex flex-col items-center">
+                <div className="h-16 flex items-center justify-center mb-4">
+                  <img 
+                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Stripe_Logo%2C_revised_2016.svg/2560px-Stripe_Logo%2C_revised_2016.svg.png" 
+                    alt="Stripe" 
+                    className="h-10 object-contain"
+                  />
+                </div>
+                <h3 className="font-bold text-center">Stripe</h3>
+                <p className="text-sm text-gray-500 text-center">Payments</p>
+              </div>
+
+              {/* Sentry */}
+              <div className="flex flex-col items-center">
+                <div className="h-16 flex items-center justify-center mb-4">
+                  <img 
+                    src="https://seeklogo.com/images/S/sentry-logo-36928B74C1-seeklogo.com.png" 
+                    alt="Sentry" 
+                    className="h-14 object-contain"
+                  />
+                </div>
+                <h3 className="font-bold text-center">Sentry</h3>
+                <p className="text-sm text-gray-500 text-center">Error Monitoring</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* University Partners Section */}
+      <section id="partners" className={`py-20 bg-white transition-all duration-1000 transform ${isVisible.partners ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+              University Partners
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Bringing Hustl to campuses across the country
+            </p>
+          </div>
+
+          <div className="max-w-5xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {/* University of Florida */}
+              <div className="bg-gradient-to-br from-blue-50 to-orange-50 rounded-xl p-8 shadow-lg border border-blue-100 flex flex-col items-center">
+                <div className="h-24 flex items-center justify-center mb-6">
+                  <img 
+                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/University_of_Florida_logo.svg/1280px-University_of_Florida_logo.svg.png" 
+                    alt="University of Florida" 
+                    className="h-20 object-contain"
+                  />
+                </div>
+                <h3 className="text-xl font-bold mb-2 text-center">University of Florida</h3>
+                <p className="text-gray-600 text-center">
+                  Our founding campus and first university partner
+                </p>
+                <div className="mt-4 bg-blue-600 text-white px-4 py-1 rounded-full text-sm font-medium">
+                  Active
+                </div>
+              </div>
+
+              {/* Coming Soon */}
+              <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-8 shadow-lg border border-gray-200 flex flex-col items-center">
+                <div className="h-24 flex items-center justify-center mb-6">
+                  <Building className="w-16 h-16 text-gray-400" />
+                </div>
+                <h3 className="text-xl font-bold mb-2 text-center">More Universities</h3>
+                <p className="text-gray-600 text-center">
+                  We're expanding to more campuses soon
+                </p>
+                <div className="mt-4 bg-gray-500 text-white px-4 py-1 rounded-full text-sm font-medium">
+                  Coming Soon
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Business Inquiries Section */}
+      <section id="business" className={`py-20 bg-gradient-to-b from-gray-50 to-white transition-all duration-1000 transform ${isVisible.business ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+        <div className="container mx-auto px-6">
+          <div className="max-w-5xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+                Partner with Hustl
+              </h2>
+              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                Bring the power of student collaboration to your campus
+              </p>
+            </div>
+
+            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-8 md:p-12 shadow-xl">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                <div>
+                  <h3 className="text-2xl font-bold mb-4">For Universities</h3>
+                  <p className="text-gray-700 mb-6">
+                    Partner with Hustl to provide your students with a safe, efficient platform for campus collaboration. Our platform helps improve student life, increase campus engagement, and provide flexible earning opportunities.
+                  </p>
+                  <ul className="space-y-3 mb-6">
+                    <li className="flex items-start">
+                      <div className="bg-blue-100 p-1 rounded-full mr-2 mt-1">
+                        <Check className="w-4 h-4 text-blue-600" />
+                      </div>
+                      <span className="text-gray-700">Improve student satisfaction and retention</span>
+                    </li>
+                    <li className="flex items-start">
+                      <div className="bg-blue-100 p-1 rounded-full mr-2 mt-1">
+                        <Check className="w-4 h-4 text-blue-600" />
+                      </div>
+                      <span className="text-gray-700">Enhance campus community and engagement</span>
+                    </li>
+                    <li className="flex items-start">
+                      <div className="bg-blue-100 p-1 rounded-full mr-2 mt-1">
+                        <Check className="w-4 h-4 text-blue-600" />
+                      </div>
+                      <span className="text-gray-700">Provide flexible earning opportunities for students</span>
+                    </li>
+                  </ul>
+                </div>
+                
+                <div className="bg-white rounded-xl p-6 shadow-lg">
+                  <h4 className="text-xl font-bold mb-4">Business Inquiries</h4>
+                  <p className="text-gray-600 mb-6">
+                    Interested in bringing Hustl to your campus? Contact our partnerships team.
+                  </p>
+                  <a 
+                    href="mailto:partnerships@hustlapp.com"
+                    className="bg-gradient-to-r from-[#0038FF] to-[#0021A5] text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition duration-200 flex items-center justify-center shadow-md"
+                  >
+                    <Mail className="w-5 h-5 mr-2" />
+                    Contact Partnerships
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="py-20 bg-gradient-to-r from-[#0038FF] to-[#0021A5] text-white">
         <div className="container mx-auto px-6 text-center">
           <h2 className="text-3xl sm:text-4xl font-bold mb-6">
-            Ready to Get Started?
+            Join the Movement
           </h2>
           <p className="text-xl text-blue-100 max-w-3xl mx-auto mb-8">
-            Join thousands of students already using Hustl to connect, help each other, and make campus life easier.
+            Be part of the revolution in campus collaboration. Connect, help, and earn with Hustl.
           </p>
           <StarBorder color="#FFFFFF">
             <Link
-              to="/app"
+              to="/"
               className="bg-white text-[#0038FF] px-8 py-4 rounded-xl font-bold text-lg hover:bg-opacity-90 transition duration-300 inline-flex items-center shadow-lg"
             >
-              Go to App
+              Join the Movement
               <ArrowRight className="ml-2 w-5 h-5" />
             </Link>
           </StarBorder>
@@ -475,5 +711,21 @@ const LandingPage = () => {
     </div>
   );
 };
+
+// Check component for use in the LandingPage
+const Check = ({ className = "w-6 h-6" }) => (
+  <svg 
+    xmlns="http://www.w3.org/2000/svg" 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round" 
+    className={className}
+  >
+    <polyline points="20 6 9 17 4 12"></polyline>
+  </svg>
+);
 
 export default LandingPage;
