@@ -21,7 +21,7 @@ const PoweredByBolt: React.FC<PoweredByBoltProps> = ({
       href="https://bolt.new"
       target="_blank"
       rel="noopener noreferrer"
-      className={`inline-block transition-all duration-300 hover:opacity-90 ${positionClasses[position]} ${className}`}
+      className={`inline-block transition-all duration-300 hover:opacity-90 ${positionClasses[position]} ${className} z-50`}
     >
       <img 
         src="/black_circle_360x360.png" 
